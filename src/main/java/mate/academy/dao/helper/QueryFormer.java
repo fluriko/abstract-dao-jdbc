@@ -14,8 +14,8 @@ public class QueryFormer<T, ID> {
 
     public String getQueryForSave(T object) {
         String table = getTableName();
-        String columns = "(" + getColumns() + ")";
-        String values = "(" + getValues(object) + ")";
+        String columns = "(" + getColumnsNotId() + ")";
+        String values = "(" + getValuesNotId(object) + ")";
         return  "INSERT INTO " + table + columns + " VALUES" + values;
     }
 
@@ -58,6 +58,17 @@ public class QueryFormer<T, ID> {
         return columns.toString().toUpperCase();
     }
 
+    private String getColumnsNotId() {
+        StringBuilder columns = new StringBuilder();
+        Field[] fields = clazzT.getDeclaredFields();
+        Arrays.stream(fields)
+                .peek((field -> field.setAccessible(true)))
+                .filter((field -> !field.getName().equalsIgnoreCase("ID")))
+                .forEach(field -> columns.append(field.getName()).append(","));
+        columns.deleteCharAt(columns.length() - 1);
+        return columns.toString().toUpperCase();
+    }
+
     private String getValues(T object) {
         StringBuilder values = new StringBuilder();
         Field[] fields = clazzT.getDeclaredFields();
@@ -70,6 +81,26 @@ public class QueryFormer<T, ID> {
                         .append("',");
             } catch (IllegalAccessException e) {
                 logger.error("Error in getting values", e);
+            }
+        }
+        values.deleteCharAt(values.length() - 1);
+        return values.toString();
+    }
+
+    private String getValuesNotId(T object) {
+        StringBuilder values = new StringBuilder();
+        Field[] fields = clazzT.getDeclaredFields();
+        for (Field field: fields) {
+            field.setAccessible(true);
+            if (!field.getName().equalsIgnoreCase("id")) {
+                try {
+                    values
+                            .append("'")
+                            .append(field.get(object))
+                            .append("',");
+                } catch (IllegalAccessException e) {
+                    logger.error("Error in getting values", e);
+                }
             }
         }
         values.deleteCharAt(values.length() - 1);
