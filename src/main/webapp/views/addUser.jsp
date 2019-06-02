@@ -19,7 +19,7 @@
         email
         <input type="email" name="email"><br/><br/>
         password
-        <input type="password" minlength="8" maxlength="20" name="password"><br/><br/>
+        <input type="password" minlength="8" maxlength="20" name="password"><br/><br/><br/>
         <button type="submit">Submit</button><br/><br/><br/>
     </form>
     <button onclick="location.href='/users'">back to users</button><br/><br/>

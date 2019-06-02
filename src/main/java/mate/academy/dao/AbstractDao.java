@@ -4,9 +4,9 @@ import mate.academy.dao.helper.QueryFormer;
 import org.apache.log4j.Logger;
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,8 +27,8 @@ public abstract class AbstractDao<T, ID> implements GenericDao<T, ID> {
     public T save(T object) {
         String query = queryFormer.getQueryForSave(object);
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(query);
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Exception in saving to h2", e);
         }
@@ -38,8 +38,8 @@ public abstract class AbstractDao<T, ID> implements GenericDao<T, ID> {
     public Optional<T> get(ID id) {
         String query = queryFormer.getQueryForGet(id);
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return getFromResultSet(resultSet);
             }
@@ -72,8 +72,8 @@ public abstract class AbstractDao<T, ID> implements GenericDao<T, ID> {
     public T update(T object) {
         String query = queryFormer.getQueryForUpdate(object);
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(query);
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Exception in updating to h2", e);
         }
@@ -83,8 +83,8 @@ public abstract class AbstractDao<T, ID> implements GenericDao<T, ID> {
     public T delete(T object) {
         String query = queryFormer.getQueryForDelete(object);
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(query);
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate();
         } catch (SQLException e) {
             logger.error("Exception in deleting from h2", e);
         }
@@ -95,8 +95,8 @@ public abstract class AbstractDao<T, ID> implements GenericDao<T, ID> {
         String query = queryFormer.getQueryForGetAll();
         List<T> objects = new ArrayList<>();
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 T object = getFromResultSet(resultSet).get();
                 objects.add(object);

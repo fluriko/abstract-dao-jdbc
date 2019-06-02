@@ -125,7 +125,10 @@ public class QueryFormer<T, ID> {
         try {
             Field field = clazzT.getDeclaredField("id");
             field.setAccessible(true);
-            return field.get(object).toString();
+            if (field.get(object) != null) {
+                return field.get(object).toString();
+            }
+            return "";
         } catch (NoSuchFieldException | IllegalAccessException e) {
             logger.error("Error in getting id value", e);
             return "";

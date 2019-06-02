@@ -20,8 +20,8 @@
         email
         <input type="email" name="email" value="<c:out value="${userToEdit.email}"/>"><br/><br/>
         password
-        <input type="password" minlength="8" maxlength="20" name="password"><br/>
-        <button type="submit">Submit</button><br/><br/>
+        <input type="password" minlength="8" maxlength="20" name="password"><br/><br/><br/>
+        <button type="submit">Submit</button><br/><br/><br/>
     </form>
     <button onclick="location.href='/users'">Back to users</button><br/><br/>
     <button onclick="location.href='/home'">Bach to home</button><br/><br/>
