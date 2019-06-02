@@ -13,13 +13,20 @@ public class QueryFormer<T, ID> {
     }
 
     public String getQueryForSave(T object) {
+        if (getIdValue(object).isEmpty()) {
+            return getQueryForSaveNoId(object);
+        }
+        return getQueryForSaveWithId(object);
+    }
+
+    private String getQueryForSaveNoId(T object) {
         String table = getTableName();
         String columns = "(" + getColumnsNotId() + ")";
         String values = "(" + getValuesNotId(object) + ")";
         return  "INSERT INTO " + table + columns + " VALUES" + values;
     }
 
-    public String getQueryForSaveWithId(T object) {
+    private String getQueryForSaveWithId(T object) {
         String table = getTableName();
         String columns = "(" + getColumns() + ")";
         String values = "(" + getValues(object) + ")";
