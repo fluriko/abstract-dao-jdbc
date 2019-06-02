@@ -19,6 +19,13 @@ public class QueryFormer<T, ID> {
         return  "INSERT INTO " + table + columns + " VALUES" + values;
     }
 
+    public String getQueryForSaveWithId(T object) {
+        String table = getTableName();
+        String columns = "(" + getColumns() + ")";
+        String values = "(" + getValues(object) + ")";
+        return  "INSERT INTO " + table + columns + " VALUES" + values;
+    }
+
     public String getQueryForGet(ID id) {
         String table = getTableName();
         String columns = getColumns();
