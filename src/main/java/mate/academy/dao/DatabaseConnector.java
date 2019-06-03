@@ -7,12 +7,11 @@ import java.util.Optional;
 
 public class DatabaseConnector {
     private static final Logger logger = Logger.getLogger(DatabaseConnector.class);
-
     private static final String userName = "sa";
     private static final String password = "";
     private static final String connectionUrl = "jdbc:h2:tcp://localhost/~/ma";
 
-    public static Optional<Connection> connect() {
+    public Optional<Connection> connect() {
         Connection connection;
         try {
             Class.forName("org.h2.Driver");

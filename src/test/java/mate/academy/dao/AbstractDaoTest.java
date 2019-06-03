@@ -1,59 +1,78 @@
 package mate.academy.dao;
 
 import mate.academy.model.User;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Optional;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AbstractDaoTest {
-    UserDao userDao;
-    User userToSave;
+
+    @Mock
+    private DatabaseConnector databaseConnector;
+
+    @Mock
+    private Connection connection;
+
+    @Mock
+    private PreparedStatement preparedStatement;
+
+    @Mock
+    private ResultSet resultSet;
+
+    private User user;
 
     @Before
-    public void init() {
-        userDao = new UserDaoImpl();
-        userToSave = new User(44L, "someUser", "someEmail", "somePass");
+    public void setUp() throws Exception {
+        Assert.assertNotNull(databaseConnector);
+        Mockito.when(connection.prepareStatement(Matchers.any(String.class))).thenReturn(preparedStatement);
+        Mockito.when(databaseConnector.connect()).thenReturn(Optional.of(connection));
+        user = new User();
+        user.setId(55L);
+        user.setLogin("login");
+        user.setEmail("email@gmail.com");
+        user.setPassword("password");
+        Mockito.when(resultSet.next()).thenReturn(true);
+        Mockito.when(resultSet.getLong(1)).thenReturn(55L);
+        Mockito.when(resultSet.getString(2)).thenReturn(user.getLogin());
+        Mockito.when(resultSet.getString(3)).thenReturn(user.getEmail());
+        Mockito.when(resultSet.getString(4)).thenReturn(user.getPassword());
     }
 
-    @After
-    public void clear() {
-        userDao.delete(userToSave);
-    }
-
-    @Test
-    public void save() {
-        User user = userDao.save(userToSave);
-        User userGet = userDao.get(44L).orElseGet(User::new);
-        Assert.assertEquals(user, userGet);
-    }
-
-    @Test
-    public void get() {
-        userDao.save(userToSave);
-        User userGet = userDao.get(44L).orElseGet(User::new);
-        Assert.assertEquals(userToSave, userGet);
+    @Test(expected = NullPointerException.class)
+    public void saveNullUser() {
+        new UserDaoImpl().save(null);
     }
 
     @Test
-    public void update() {
-        userDao.save(userToSave);
-        userToSave.setEmail("newEmail");
-        userDao.update(userToSave);
-        User userGet = userDao.get(44L).orElseGet(User::new);
-        Assert.assertEquals(userToSave, userGet);
+    public void saveUser() {
+        new UserDaoImpl().save(user);
     }
 
     @Test
-    public void delete() {
-        userDao.save(userToSave);
-        userDao.delete(userToSave);
-        Assert.assertFalse(userDao.get(44L).isPresent());
+    public void saveAndGet() {
+        UserDao userDao = new UserDaoImpl();
+        userDao.save(user);
+        User userFromDb = userDao.get(55L).orElseGet(User::new);
+        Assert.assertEquals(user, userFromDb);
     }
 
     @Test
-    public void getAll() {
-        userDao.save(userToSave);
-        Assert.assertFalse(userDao.getAll().get().isEmpty());
+    public void saveUpdateGet() {
+        UserDao userDao = new UserDaoImpl();
+        userDao.save(user);
+        user.setPassword("newPassword");
+        userDao.update(user);
+        User userFromDb = userDao.get(55L).orElseGet(User::new);
+        Assert.assertEquals(user, userFromDb);
     }
 }

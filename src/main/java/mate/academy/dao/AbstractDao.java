@@ -21,7 +21,8 @@ public abstract class AbstractDao<T, ID> implements GenericDao<T, ID> {
     public AbstractDao(Class<T> clazzT) {
         this.clazzT = clazzT;
         queryFormer = new QueryFormer<>(clazzT);
-        this.connection = DatabaseConnector.connect().get();
+        DatabaseConnector databaseConnector = new DatabaseConnector();
+        this.connection = databaseConnector.connect().get();
     }
 
     public T save(T object) {
