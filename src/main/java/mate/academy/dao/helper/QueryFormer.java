@@ -86,17 +86,18 @@ public class QueryFormer<T, ID> {
     private String getValues(T object) {
         StringBuilder values = new StringBuilder();
         Field[] fields = clazzT.getDeclaredFields();
-        for (Field field: fields) {
-            field.setAccessible(true);
-            try {
-                values
-                        .append("'")
-                        .append(field.get(object))
-                        .append("',");
-            } catch (IllegalAccessException e) {
+        Arrays.stream(fields)
+                .peek(field -> field.setAccessible(true))
+                .forEach(field -> {
+                    try {
+                        values
+                                .append("'")
+                                .append(field.get(object))
+                                .append("',");
+                    } catch (IllegalAccessException e) {
                 logger.error("Error in getting values", e);
-            }
-        }
+                    }
+                });
         values.deleteCharAt(values.length() - 1);
         return values.toString();
     }
@@ -104,19 +105,19 @@ public class QueryFormer<T, ID> {
     private String getValuesNotId(T object) {
         StringBuilder values = new StringBuilder();
         Field[] fields = clazzT.getDeclaredFields();
-        for (Field field: fields) {
-            field.setAccessible(true);
-            if (!field.getName().equalsIgnoreCase("id")) {
-                try {
-                    values
-                            .append("'")
-                            .append(field.get(object))
-                            .append("',");
-                } catch (IllegalAccessException e) {
-                    logger.error("Error in getting values", e);
-                }
-            }
-        }
+        Arrays.stream(fields)
+                .peek(field -> field.setAccessible(true))
+                .filter((field -> !field.getName().equalsIgnoreCase("ID")))
+                .forEach(field -> {
+                    try {
+                        values
+                                .append("'")
+                                .append(field.get(object))
+                                .append("',");
+                    } catch (IllegalAccessException e) {
+                        logger.error("Error in getting values", e);
+                    }
+                });
         values.deleteCharAt(values.length() - 1);
         return values.toString();
     }
